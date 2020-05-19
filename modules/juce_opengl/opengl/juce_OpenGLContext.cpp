@@ -468,7 +468,10 @@ public:
 
            #if JUCE_MAC
             if (cvDisplayLinkWrapper != nullptr)
-                repaintEvent.wait (1000);
+            {
+                repaintEvent.wait (-1);
+                renderFrame();
+            }
             else
            #endif
             if (! renderFrame())
@@ -685,7 +688,7 @@ public:
                                              CVOptionFlags, CVOptionFlags*, void* displayLinkContext)
         {
             auto* self = (CachedImage*) displayLinkContext;
-            self->renderFrame();
+            self->repaintEvent.signal();
             return kCVReturnSuccess;
         }
 
