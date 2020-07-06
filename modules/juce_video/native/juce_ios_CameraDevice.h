@@ -1264,7 +1264,7 @@ struct CameraDevice::ViewerComponent  : public UIViewComponent
     private:
         static void layoutSubviews (id self, SEL)
         {
-            sendSuperclassMessage (self, @selector (layoutSubviews));
+            sendSuperclassMessage<void> (self, @selector (layoutSubviews));
 
             UIView* asUIView = (UIView*) self;
 
