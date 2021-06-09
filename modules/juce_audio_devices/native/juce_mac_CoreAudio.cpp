@@ -34,6 +34,13 @@ namespace juce
  #pragma clang diagnostic ignored "-Wnonnull" // avoid some spurious 10.11 SDK warnings
 #endif
 
+constexpr auto juceAudioObjectPropertyElementMain =
+       #if defined (MAC_OS_VERSION_12_0)
+        kAudioObjectPropertyElementMain;
+       #else
+        kAudioObjectPropertyElementMaster;
+       #endif
+
 //==============================================================================
 struct SystemVol
 {
@@ -41,7 +48,7 @@ struct SystemVol
         : outputDeviceID (kAudioObjectUnknown)
     {
         addr.mScope    = kAudioObjectPropertyScopeGlobal;
-        addr.mElement  = kAudioObjectPropertyElementMaster;
+        addr.mElement  = juceAudioObjectPropertyElementMain;
         addr.mSelector = kAudioHardwarePropertyDefaultOutputDevice;
 
         if (AudioObjectHasProperty (kAudioObjectSystemObject, &addr))
@@ -51,7 +58,7 @@ struct SystemVol
 
             if (status == noErr)
             {
-                addr.mElement  = kAudioObjectPropertyElementMaster;
+                addr.mElement  = juceAudioObjectPropertyElementMain;
                 addr.mSelector = selector;
                 addr.mScope    = kAudioDevicePropertyScopeOutput;
 
@@ -128,9 +135,16 @@ private:
  #pragma clang diagnostic pop
 #endif
 
+constexpr auto juceAudioHardwareServiceDeviceProperty_VirtualMainVolume =
+       #if defined (MAC_OS_VERSION_12_0)
+        kAudioHardwareServiceDeviceProperty_VirtualMainVolume;
+       #else
+        kAudioHardwareServiceDeviceProperty_VirtualMasterVolume;
+       #endif
+
 #define JUCE_SYSTEMAUDIOVOL_IMPLEMENTED 1
-float JUCE_CALLTYPE SystemAudioVolume::getGain()              { return SystemVol (kAudioHardwareServiceDeviceProperty_VirtualMasterVolume).getGain(); }
-bool  JUCE_CALLTYPE SystemAudioVolume::setGain (float gain)   { return SystemVol (kAudioHardwareServiceDeviceProperty_VirtualMasterVolume).setGain (gain); }
+float JUCE_CALLTYPE SystemAudioVolume::getGain()              { return SystemVol (juceAudioHardwareServiceDeviceProperty_VirtualMainVolume).getGain(); }
+bool  JUCE_CALLTYPE SystemAudioVolume::setGain (float gain)   { return SystemVol (juceAudioHardwareServiceDeviceProperty_VirtualMainVolume).setGain (gain); }
 bool  JUCE_CALLTYPE SystemAudioVolume::isMuted()              { return SystemVol (kAudioDevicePropertyMute).isMuted(); }
 bool  JUCE_CALLTYPE SystemAudioVolume::setMuted (bool mute)   { return SystemVol (kAudioDevicePropertyMute).setMuted (mute); }
 
@@ -209,7 +223,7 @@ public:
         AudioObjectPropertyAddress pa;
         pa.mSelector = kAudioDevicePropertyStreamConfiguration;
         pa.mScope = input ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput;
-        pa.mElement = kAudioObjectPropertyElementMaster;
+        pa.mElement = juceAudioObjectPropertyElementMain;
 
         if (OK (AudioObjectGetPropertyDataSize (deviceID, &pa, 0, nullptr, &size)))
         {
@@ -264,7 +278,7 @@ public:
 
         AudioObjectPropertyAddress pa;
         pa.mScope = kAudioObjectPropertyScopeWildcard;
-        pa.mElement = kAudioObjectPropertyElementMaster;
+        pa.mElement = juceAudioObjectPropertyElementMain;
         pa.mSelector = kAudioDevicePropertyAvailableNominalSampleRates;
         UInt32 size = 0;
 
@@ -305,7 +319,7 @@ public:
 
         AudioObjectPropertyAddress pa;
         pa.mScope = kAudioObjectPropertyScopeWildcard;
-        pa.mElement = kAudioObjectPropertyElementMaster;
+        pa.mElement = juceAudioObjectPropertyElementMain;
         pa.mSelector = kAudioDevicePropertyBufferFrameSizeRange;
         UInt32 size = 0;
 
@@ -346,7 +360,7 @@ public:
         UInt32 latency = 0;
         UInt32 size = sizeof (latency);
         AudioObjectPropertyAddress pa;
-        pa.mElement = kAudioObjectPropertyElementMaster;
+        pa.mElement = juceAudioObjectPropertyElementMain;
         pa.mSelector = kAudioDevicePropertyLatency;
         pa.mScope = scope;
         AudioObjectGetPropertyData (deviceID, &pa, 0, nullptr, &size, &latency);
@@ -362,7 +376,7 @@ public:
     int getBitDepthFromDevice (AudioObjectPropertyScope scope) const
     {
         AudioObjectPropertyAddress pa;
-        pa.mElement = kAudioObjectPropertyElementMaster;
+        pa.mElement = juceAudioObjectPropertyElementMain;
         pa.mSelector = kAudioStreamPropertyPhysicalFormat;
         pa.mScope = scope;
 
@@ -379,7 +393,7 @@ public:
     {
         AudioObjectPropertyAddress pa;
         pa.mScope = kAudioObjectPropertyScopeWildcard;
-        pa.mElement = kAudioObjectPropertyElementMaster;
+        pa.mElement = juceAudioObjectPropertyElementMain;
         pa.mSelector = kAudioDevicePropertyBufferFrameSize;
 
         UInt32 framesPerBuf = (UInt32) bufferSize;
@@ -392,7 +406,7 @@ public:
     {
         AudioObjectPropertyAddress pa;
         pa.mScope = kAudioObjectPropertyScopeWildcard;
-        pa.mElement = kAudioObjectPropertyElementMaster;
+        pa.mElement = juceAudioObjectPropertyElementMain;
         pa.mSelector = kAudioDevicePropertyDeviceIsAlive;
 
         UInt32 isAlive = 0;
@@ -508,7 +522,7 @@ public:
             AudioObjectPropertyAddress pa;
             pa.mSelector = kAudioDevicePropertyDataSourceNameForID;
             pa.mScope = input ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput;
-            pa.mElement = kAudioObjectPropertyElementMaster;
+            pa.mElement = juceAudioObjectPropertyElementMain;
 
             if (OK (AudioObjectGetPropertyData (deviceID, &pa, 0, nullptr, &transSize, &avt)))
                 s.add (buffer);
@@ -526,7 +540,7 @@ public:
         AudioObjectPropertyAddress pa;
         pa.mSelector = kAudioDevicePropertyDataSource;
         pa.mScope = input ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput;
-        pa.mElement = kAudioObjectPropertyElementMaster;
+        pa.mElement = juceAudioObjectPropertyElementMain;
 
         if (deviceID != 0)
         {
@@ -561,7 +575,7 @@ public:
                 AudioObjectPropertyAddress pa;
                 pa.mSelector = kAudioDevicePropertyDataSource;
                 pa.mScope = input ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput;
-                pa.mElement = kAudioObjectPropertyElementMaster;
+                pa.mElement = juceAudioObjectPropertyElementMain;
 
                 OSType typeId = types[index];
 
@@ -575,7 +589,7 @@ public:
         AudioObjectPropertyAddress pa;
         pa.mSelector = kAudioDevicePropertyNominalSampleRate;
         pa.mScope = kAudioObjectPropertyScopeGlobal;
-        pa.mElement = kAudioObjectPropertyElementMaster;
+        pa.mElement = juceAudioObjectPropertyElementMain;
         Float64 sr = 0;
         UInt32 size = (UInt32) sizeof (sr);
         return OK (AudioObjectGetPropertyData (deviceID, &pa, 0, nullptr, &size, &sr)) ? (double) sr : 0.0;
@@ -589,7 +603,7 @@ public:
         AudioObjectPropertyAddress pa;
         pa.mSelector = kAudioDevicePropertyNominalSampleRate;
         pa.mScope = kAudioObjectPropertyScopeGlobal;
-        pa.mElement = kAudioObjectPropertyElementMaster;
+        pa.mElement = juceAudioObjectPropertyElementMain;
         Float64 sr = newSampleRate;
         return OK (AudioObjectSetPropertyData (deviceID, &pa, 0, nullptr, sizeof (sr), &sr));
     }
@@ -631,7 +645,7 @@ public:
             AudioObjectPropertyAddress pa;
             pa.mSelector = kAudioDevicePropertyBufferFrameSize;
             pa.mScope = kAudioObjectPropertyScopeGlobal;
-            pa.mElement = kAudioObjectPropertyElementMaster;
+            pa.mElement = juceAudioObjectPropertyElementMain;
             UInt32 framesPerBuf = (UInt32) bufferSizeSamples;
 
             if (! OK (AudioObjectSetPropertyData (deviceID, &pa, 0, nullptr, sizeof (framesPerBuf), &framesPerBuf)))
@@ -720,7 +734,7 @@ public:
                 AudioObjectPropertyAddress pa;
                 pa.mSelector = kAudioDevicePropertyDeviceIsRunning;
                 pa.mScope = kAudioObjectPropertyScopeWildcard;
-                pa.mElement = kAudioObjectPropertyElementMaster;
+                pa.mElement = juceAudioObjectPropertyElementMain;
 
                 OK (AudioObjectGetPropertyData (deviceID, &pa, 0, nullptr, &size, &running));
 
@@ -898,7 +912,7 @@ private:
         AudioObjectPropertyAddress pa;
         pa.mSelector = kAudioDevicePropertyDataSources;
         pa.mScope = kAudioObjectPropertyScopeWildcard;
-        pa.mElement = kAudioObjectPropertyElementMaster;
+        pa.mElement = juceAudioObjectPropertyElementMain;
         UInt32 size = 0;
 
         if (deviceID != 0
@@ -2030,7 +2044,7 @@ public:
         AudioObjectPropertyAddress pa;
         pa.mSelector = kAudioHardwarePropertyDevices;
         pa.mScope = kAudioObjectPropertyScopeWildcard;
-        pa.mElement = kAudioObjectPropertyElementMaster;
+        pa.mElement = juceAudioObjectPropertyElementMain;
 
         if (AudioObjectGetPropertyDataSize (kAudioObjectSystemObject, &pa, 0, nullptr, &size) == noErr)
         {
@@ -2095,7 +2109,7 @@ public:
         pa.mSelector = forInput ? kAudioHardwarePropertyDefaultInputDevice
                                 : kAudioHardwarePropertyDefaultOutputDevice;
         pa.mScope    = kAudioObjectPropertyScopeWildcard;
-        pa.mElement  = kAudioObjectPropertyElementMaster;
+        pa.mElement  = juceAudioObjectPropertyElementMain;
 
         if (AudioObjectGetPropertyData (kAudioObjectSystemObject, &pa, 0, nullptr, &size, &deviceID) == noErr)
         {
@@ -2203,7 +2217,7 @@ private:
         AudioObjectPropertyAddress pa;
         pa.mSelector = kAudioDevicePropertyStreamConfiguration;
         pa.mScope = input ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput;
-        pa.mElement = kAudioObjectPropertyElementMaster;
+        pa.mElement = juceAudioObjectPropertyElementMain;
 
         if (AudioObjectGetPropertyDataSize (deviceID, &pa, 0, nullptr, &size) == noErr)
         {

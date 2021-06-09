@@ -274,6 +274,27 @@ String SystemStats::getOperatingSystemName()
         case WinVista:          name = "Windows Vista";     break;
         case WinXP:             name = "Windows XP";        break;
         case Win2000:           name = "Windows 2000";      break;
+
+        case MacOSX:            JUCE_FALLTHROUGH
+        case Windows:           JUCE_FALLTHROUGH
+        case Linux:             JUCE_FALLTHROUGH
+        case Android:           JUCE_FALLTHROUGH
+        case iOS:               JUCE_FALLTHROUGH
+
+        case MacOSX_10_7:       JUCE_FALLTHROUGH
+        case MacOSX_10_8:       JUCE_FALLTHROUGH
+        case MacOSX_10_9:       JUCE_FALLTHROUGH
+        case MacOSX_10_10:      JUCE_FALLTHROUGH
+        case MacOSX_10_11:      JUCE_FALLTHROUGH
+        case MacOSX_10_12:      JUCE_FALLTHROUGH
+        case MacOSX_10_13:      JUCE_FALLTHROUGH
+        case MacOSX_10_14:      JUCE_FALLTHROUGH
+        case MacOSX_10_15:      JUCE_FALLTHROUGH
+        case MacOS_11:          JUCE_FALLTHROUGH
+        case MacOS_12:          JUCE_FALLTHROUGH
+
+        case UnknownOS:         JUCE_FALLTHROUGH
+        case WASM:              JUCE_FALLTHROUGH
         default:                jassertfalse; break; // !! new type of OS?
     }
 
