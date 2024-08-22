@@ -1552,7 +1552,7 @@ public:
 
         currentSampleRate = sampleRate;
         currentBufferSize = bufferSize;
-        targetLatency = bufferSize;
+        targetLatency = bufferSize * 2;
 
         for (auto& d : getDeviceWrappers())
         {
